@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -14,22 +15,30 @@ type server struct {
 	logger *logrus.Logger
 }
 
+var instance *server
+var once sync.Once
+
 func New(config *Config) *server {
-	return &server{
-		config: config,
-		router: mux.NewRouter(),
-		logger: logrus.New(),
-	}
+	once.Do(func() {
+		instance = &server{
+			config: config,
+			router: mux.NewRouter(),
+			logger: logrus.New(),
+		}
+	})
+
+	return instance
 }
 
-func (s *server) Run() error {
-	if err := s.configureLogger(); err != nil {
-		return err
+func (s *server) Start() error {
+	err := s.configureLogger()
+	if err != nil {
+		s.logger.Info("Can't configure logger. Logger now configure by default settings")
 	}
 
-	s.logger.Infof("Starting server on %v port", s.config.Port)
-	s.router.HandleFunc("/", handlers.HandleHello)
+	s.configureRouter()
 
+	s.logger.Infof("Starting server on %s port", s.config.Port)
 	return http.ListenAndServe(s.config.Port, s.router)
 }
 
@@ -40,6 +49,9 @@ func (s *server) configureLogger() error {
 	}
 
 	logrus.SetLevel(level)
-
 	return nil
+}
+
+func (s *server) configureRouter() {
+	s.router.HandleFunc("/1", handlers.HandleReplenishmentBalance).Methods("GET")
 }
