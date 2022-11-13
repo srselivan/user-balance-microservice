@@ -6,19 +6,18 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/sirupsen/logrus"
-	"github.com/srselivan/user-balance-microservice/internal/server"
 )
 
 type database struct {
 	db     *sql.DB
-	config *server.Config
+	config *Config
 	logger *logrus.Logger
 }
 
 var instance *database
 var once sync.Once
 
-func New(config *server.Config) *database {
+func New(config *Config) *database {
 	once.Do(func() {
 		instance = &database{
 			db:     &sql.DB{},
@@ -32,11 +31,12 @@ func New(config *server.Config) *database {
 
 func (db *database) ConnectToDB() error {
 	cfg := mysql.Config{
-		User:   "root",
-		Passwd: "root",
-		Net:    "tcp",
-		Addr:   "127.0.0.1:3306",
-		DBName: "mysql",
+		User:    db.config.User,
+		Passwd:  db.config.Passwd,
+		Net:     db.config.Net,
+		Addr:    db.config.Addr,
+		DBName:  db.config.DBName,
+		Timeout: db.config.Timeout,
 	}
 
 	var err error
@@ -51,11 +51,12 @@ func (db *database) ConnectToDB() error {
 		return err
 	}
 
-	db.logger.Info("Connect to database")
+	db.logger.Infof("Connect to database %s, on addr %s, with timeout %v", cfg.DBName, cfg.Addr, cfg.Timeout)
 	return nil
 }
 
 func (db *database) CloseConnection() error {
+	db.logger.Info("Close connection to database")
 	return db.db.Close()
 }
 

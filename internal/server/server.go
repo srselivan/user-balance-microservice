@@ -53,5 +53,5 @@ func (s *server) configureLogger() error {
 }
 
 func (s *server) configureRouter() {
-	s.router.HandleFunc("/1", handlers.HandleReplenishmentBalance).Methods("GET")
+	s.router.HandleFunc("/health", handlers.Health().ServeHTTP).Methods("GET")
 }

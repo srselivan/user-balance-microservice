@@ -9,18 +9,23 @@ import (
 )
 
 func main() {
-	config := server.NewConfig()
-	if _, err := toml.DecodeFile("configs/microservice.toml", config); err != nil {
+	srvConfig := server.NewConfig()
+	if _, err := toml.DecodeFile("configs/microservice.toml", srvConfig); err != nil {
 		log.Print(err)
 	}
 
-	bd := database.New(config)
+	dbConfig := database.NewConfig()
+	if _, err := toml.DecodeFile("configs/microservice.toml", dbConfig); err != nil {
+		log.Print(err)
+	}
+
+	bd := database.New(dbConfig)
 	if err := bd.ConnectToDB(); err != nil {
 		log.Fatal(err)
 	}
 	defer bd.CloseConnection()
 
-	s := server.New(config)
+	s := server.New(srvConfig)
 	if err := s.Start(); err != nil {
 		log.Fatal(err)
 	}

@@ -1,11 +1,12 @@
-[server]
+#server
 port = ":8000"
 server_log_level = "debug"
 
-[database]
+#database
 user = "root"
 passwd = "root"
 net = "tcp"
 addr = "127.0.0.1:3306"
 dBName = "recordings"
+timeout = "60s"
 database_log_level = "debug"

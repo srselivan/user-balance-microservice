@@ -1,6 +1,6 @@
 package model
 
 type User struct {
-	ID      int64
-	Balance float32
+	ID      int64   `json:"id"`
+	Balance float64 `json:"balance"`
 }
