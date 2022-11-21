@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/sirupsen/logrus"
-	"github.com/srselivan/user-balance-microservice/internal/model"
+	"github.com/srselivan/user-balance-microservice/internal/database"
 )
 
 func readReqBody(r *http.Request, v any) error {
@@ -15,7 +15,7 @@ func readReqBody(r *http.Request, v any) error {
 		return err
 	}
 
-	err = json.Unmarshal(body, &v)
+	err = json.Unmarshal(body, v)
 	if err != nil {
 		return err
 	}
@@ -33,30 +33,41 @@ func HandleAppendBalance() http.Handler {
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := readReqBody(r, reqStruct)
+		err := readReqBody(r, &reqStruct)
 		if err != nil {
 			logrus.Info(err)
 			return
 		}
 
-		//ADD AMOUNT TO USER DATA HERE
+		err = database.AppendBalanceById(reqStruct.Id, reqStruct.Amount)
+		if err != nil {
+			logrus.Info(err)
+			return
+		}
+
 		w.WriteHeader(http.StatusOK)
 	})
 }
 
 func HandleGetBalance() http.Handler {
-	user := model.NewUser()
+	reqStruct := struct {
+		Id int64 `json:"id"`
+	}{
+		-1,
+	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := readReqBody(r, user)
+		err := readReqBody(r, &reqStruct)
 		if err != nil {
 			logrus.Info(err)
 			return
 		}
 
-		//get balance
+		user, err := database.GetUserById(reqStruct.Id)
+		if err != nil {
+			logrus.Info(err)
+		}
 
-		user.SetBalance(123) //by db
 		responseJson, err := json.Marshal(user)
 		if err != nil {
 			logrus.Info(err)
@@ -80,14 +91,17 @@ func HandleTransferBalance() http.Handler {
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := readReqBody(r, reqStruct)
+		err := readReqBody(r, &reqStruct)
 		if err != nil {
 			logrus.Info(err)
 			return
 		}
 
-		//Connect to db
-		//Do work
+		err = database.TransferBalance(reqStruct.SendId, reqStruct.ReceiveId, reqStruct.Amount)
+		if err != nil {
+			logrus.Info(err)
+			return
+		}
 
 		w.WriteHeader(http.StatusOK)
 	})
@@ -107,7 +121,7 @@ func HandleDebit() http.Handler {
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := readReqBody(r, reqStruct)
+		err := readReqBody(r, &reqStruct)
 		if err != nil {
 			logrus.Info(err)
 			return

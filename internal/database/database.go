@@ -9,7 +9,7 @@ import (
 )
 
 type database struct {
-	db     *sql.DB
+	store  *sql.DB
 	config *Config
 	logger *logrus.Logger
 }
@@ -20,7 +20,7 @@ var once sync.Once
 func New(config *Config) *database {
 	once.Do(func() {
 		instance = &database{
-			db:     &sql.DB{},
+			store:  &sql.DB{},
 			config: config,
 			logger: logrus.New(),
 		}
@@ -31,22 +31,20 @@ func New(config *Config) *database {
 
 func (db *database) ConnectToDB() error {
 	cfg := mysql.Config{
-		User:    db.config.User,
-		Passwd:  db.config.Passwd,
-		Net:     db.config.Net,
-		Addr:    db.config.Addr,
-		DBName:  db.config.DBName,
-		Timeout: db.config.Timeout,
+		User:   db.config.User,
+		Passwd: db.config.Passwd,
+		Net:    db.config.Net,
+		Addr:   db.config.Addr,
+		DBName: db.config.DBName,
 	}
 
 	var err error
-	db.db, err = sql.Open("mysql", cfg.FormatDSN())
+	db.store, err = sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
 		return err
 	}
-	defer db.db.Close()
 
-	err = db.db.Ping()
+	err = db.store.Ping()
 	if err != nil {
 		return err
 	}
@@ -57,7 +55,7 @@ func (db *database) ConnectToDB() error {
 
 func (db *database) CloseConnection() error {
 	db.logger.Info("Close connection to database")
-	return db.db.Close()
+	return db.store.Close()
 }
 
 func (db *database) configureLogger() error {
