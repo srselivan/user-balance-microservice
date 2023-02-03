@@ -12,7 +12,7 @@ services:
     restart: always
     image: postgres:latest
     environment:
-      - POSTGRES_PASSWORD=root
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=users
     ports:
       - 5432:5432
