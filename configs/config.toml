@@ -1,0 +1,11 @@
+[server]
+port = 8080
+server_log_level = "debug"
+
+[database]
+user = "postgres"
+password = "root"
+port = 5432
+host = "127.0.0.1"
+dbname = "users"
+database_log_level = "debug"

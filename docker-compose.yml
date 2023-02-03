@@ -4,17 +4,17 @@ services:
   app:
     build: ./
     ports:
-      - 8000:8000
+      - 8080:8080
     depends_on:
       - db
     
   db:
     restart: always
-    image: mysql:latest
+    image: postgres:latest
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=users
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=users
     ports:
-      - 3306:3306
+      - 5432:5432
     volumes:
       - ./schema:/docker-entrypoint-initdb.d

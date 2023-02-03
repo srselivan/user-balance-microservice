@@ -3,30 +3,29 @@ package main
 import (
 	"log"
 
-	"github.com/BurntSushi/toml"
-	"github.com/srselivan/user-balance-microservice/internal/database"
-	"github.com/srselivan/user-balance-microservice/internal/server"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+	"github.com/srselivan/user-balance-microservice/internal/app/server"
 )
 
+func GetViperConfig(configType string, path string) error {
+	viper.SetConfigType(configType)
+	viper.AddConfigPath(path)
+	if err := viper.ReadInConfig(); err != nil {
+		return err
+	}
+	log.Println(viper.Get("server.port"))
+
+	return nil
+}
+
 func main() {
-	srvConfig := server.NewConfig()
-	if _, err := toml.DecodeFile("configs/microservice.toml", srvConfig); err != nil {
-		log.Print(err)
+	if err := GetViperConfig("toml", "./configs"); err != nil {
+		logrus.Fatal(err)
 	}
 
-	dbConfig := database.NewConfig()
-	if _, err := toml.DecodeFile("configs/microservice.toml", dbConfig); err != nil {
-		log.Print(err)
-	}
-
-	bd := database.New(dbConfig)
-	if err := bd.ConnectToDB(); err != nil {
-		log.Fatal(err)
-	}
-	defer bd.CloseConnection()
-
-	s := server.New(srvConfig)
+	s := server.New(viper.GetViper())
 	if err := s.Start(); err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 }

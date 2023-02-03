@@ -1,9 +1,11 @@
 local:
 	go run ./cmd/.
 docker:
-	docker run -p 3306:3306 --rm --name dev -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=users -d mysql
+	docker run -p 5432:5432 --rm --name pg -e POSTGRES_PASSWORD=root -e POSTGRES_DB=users -d postgres
+exec:
+	docker exec -it pg bash
 stop:
-	docker stop dev
+	docker stop pg
 
 build:
 	docker compose build

@@ -1,10 +1,11 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/srselivan/user-balance-microservice/internal/pkg/json"
 )
 
 func Health() http.Handler {
@@ -18,7 +19,7 @@ func Health() http.Handler {
 		http.StatusOK,
 	}
 
-	responseJson, _ := json.Marshal(healthAnswer)
+	responseJson, _ := json.Encode(healthAnswer)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
