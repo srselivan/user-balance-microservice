@@ -8,4 +8,5 @@ password = "root"
 port = 5432
 host = "127.0.0.1"
 dbname = "users"
+sslmode = "disable"
 database_log_level = "debug"

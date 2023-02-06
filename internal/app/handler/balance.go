@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"database/sql"
@@ -21,30 +21,26 @@ func (h *Handler) GetBalance() http.Handler {
 		err := json.Decode(r.Body, &request)
 		if err != nil {
 			logrus.Info(err)
-			h.createResponseError(w, err, http.StatusBadRequest)
+			NewResponseError(w, err, http.StatusBadRequest)
 			return
 		}
 
-		user, err := h.store.GetUserById(request.ID)
+		balance, err := h.service.GetBalance(request.ID)
 		if err != nil {
 			logrus.Info(err)
-			if err == sql.ErrNoRows {
-				h.createResponseError(w, err, http.StatusNotFound)
-			} else {
-				h.createResponseError(w, err, http.StatusInternalServerError)
-			}
+			NewResponseError(w, err, http.StatusBadRequest)
 			return
 		}
 
-		json, err := json.Encode(user.Balance)
+		bytes, err := json.Encode(balance)
 		if err != nil {
 			logrus.Info(err)
-			h.createResponseError(w, err, http.StatusInternalServerError)
+			NewResponseError(w, err, http.StatusBadRequest)
 			return
 		}
 
 		w.WriteHeader(http.StatusOK)
-		w.Write(json)
+		w.Write(bytes)
 	})
 }
 
@@ -61,17 +57,17 @@ func (h *Handler) AppendBalance() http.Handler {
 		err := json.Decode(r.Body, &request)
 		if err != nil {
 			logrus.Info(err)
-			h.createResponseError(w, err, http.StatusBadRequest)
+			NewResponseError(w, err, http.StatusBadRequest)
 			return
 		}
 
-		err = h.store.AppendBalanceByUserId(request.ID, request.Amount)
+		err = h.service.AppendBalance(request.ID, request.Amount)
 		if err != nil {
 			logrus.Info(err)
 			if err == sql.ErrNoRows {
-				h.createResponseError(w, err, http.StatusNotFound)
+				NewResponseError(w, err, http.StatusNotFound)
 			} else {
-				h.createResponseError(w, err, http.StatusInternalServerError)
+				NewResponseError(w, err, http.StatusInternalServerError)
 			}
 			return
 		}

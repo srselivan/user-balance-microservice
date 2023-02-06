@@ -4,19 +4,11 @@ CREATE TABLE users (
   	PRIMARY KEY(id)
 );
 
-CREATE TABLE reserve (
+CREATE TABLE holder (
   	user_id bigint REFERENCES users(id) NOT NULL,
 	order_id bigint NOT NULL,
 	service_id bigint NOT NULL,
     amount float8
-);
-
-CREATE TABLE deals (
-  	user_id bigint REFERENCES users(id) NOT NULL,
-	order_id bigint NOT NULL,
-	service_id bigint NOT NULL,
-    amount float8,
-    date date
 );
 
 INSERT INTO users

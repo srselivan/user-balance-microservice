@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/srselivan/user-balance-microservice/internal/pkg/json"
 )
 
-func Health() http.Handler {
+func (h *Handler) Health() http.Handler {
 	healthAnswer := struct {
 		Message string `json:"message"`
 		Status  string `json:"status"`
