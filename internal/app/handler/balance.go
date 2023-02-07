@@ -16,8 +16,6 @@ func (h *Handler) GetBalance() http.Handler {
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
 		err := json.Decode(r.Body, &request)
 		if err != nil {
 			logrus.Info(err)
@@ -28,17 +26,22 @@ func (h *Handler) GetBalance() http.Handler {
 		balance, err := h.service.GetBalance(request.ID)
 		if err != nil {
 			logrus.Info(err)
-			NewResponseError(w, err, http.StatusBadRequest)
+			if err == sql.ErrNoRows {
+				NewResponseError(w, err, http.StatusNotFound)
+			} else {
+				NewResponseError(w, err, http.StatusInternalServerError)
+			}
 			return
 		}
 
 		bytes, err := json.Encode(balance)
 		if err != nil {
 			logrus.Info(err)
-			NewResponseError(w, err, http.StatusBadRequest)
+			NewResponseError(w, err, http.StatusInternalServerError)
 			return
 		}
 
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(bytes)
 	})
