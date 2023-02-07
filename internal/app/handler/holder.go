@@ -2,6 +2,7 @@ package handler
 
 import (
 	"database/sql"
+	"github.com/srselivan/user-balance-microservice/internal/app/model"
 	"net/http"
 
 	"github.com/sirupsen/logrus"
@@ -9,16 +10,11 @@ import (
 )
 
 func (h *Handler) FreezeAmount() http.Handler {
-	request := struct {
-		UserID    int64   `json:"user_id"`
-		OrderID   int64   `json:"order_id"`
-		ServiceID int64   `json:"service_id"`
-		Amount    float64 `json:"amount"`
-	}{
-		-1,
-		-1,
-		-1,
-		-1,
+	request := model.HolderStruct{
+		UserID:    -1,
+		OrderID:   -1,
+		ServiceID: -1,
+		Amount:    0,
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +25,7 @@ func (h *Handler) FreezeAmount() http.Handler {
 			return
 		}
 
-		err = h.service.FreezeAmount(request.UserID, request.OrderID, request.ServiceID, request.Amount)
+		err = h.service.FreezeAmount(request)
 		if err != nil {
 			logrus.Info(err)
 			if err == sql.ErrNoRows {
@@ -46,16 +42,11 @@ func (h *Handler) FreezeAmount() http.Handler {
 }
 
 func (h *Handler) UnFreezeAmount() http.Handler {
-	request := struct {
-		UserID    int64   `json:"user_id"`
-		OrderID   int64   `json:"order_id"`
-		ServiceID int64   `json:"service_id"`
-		Amount    float64 `json:"amount"`
-	}{
-		-1,
-		-1,
-		-1,
-		-1,
+	request := model.HolderStruct{
+		UserID:    -1,
+		OrderID:   -1,
+		ServiceID: -1,
+		Amount:    0,
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +57,7 @@ func (h *Handler) UnFreezeAmount() http.Handler {
 			return
 		}
 
-		err = h.service.UnFreezeAmount(request.UserID, request.OrderID, request.ServiceID, request.Amount)
+		err = h.service.UnFreezeAmount(request)
 		if err != nil {
 			logrus.Info(err)
 			NewResponseError(w, err, http.StatusInternalServerError)

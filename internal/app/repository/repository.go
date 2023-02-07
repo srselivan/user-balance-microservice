@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/srselivan/user-balance-microservice/internal/app/model"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -17,8 +18,8 @@ type Balance interface {
 }
 
 type Holder interface {
-	FreezeAmount(userID int64, orderID int64, serviceID int64, amount float64) error
-	UnFreezeAmount(userID int64, orderID int64, serviceID int64, amount float64) error
+	FreezeAmount(holderStruct model.HolderStruct) error
+	UnFreezeAmount(holderStruct model.HolderStruct) error
 }
 
 type Store struct {
