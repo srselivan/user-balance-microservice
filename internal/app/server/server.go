@@ -32,11 +32,11 @@ func (s *Server) Run(port string, handler *handler.Handler) error {
 }
 
 func (s *Server) configureRouter(handler *handler.Handler) {
-	s.router.HandleFunc("/health", handler.Health().ServeHTTP).Methods("GET")
+	s.router.HandleFunc("/api/v1/health", handler.Health().ServeHTTP).Methods("GET")
 
-	s.router.HandleFunc("/balance", handler.GetBalance().ServeHTTP).Methods("GET")
-	s.router.HandleFunc("/balance", handler.AppendBalance().ServeHTTP).Methods("PUT")
+	s.router.HandleFunc("/api/v1/balance", handler.GetBalance().ServeHTTP).Methods("GET")
+	s.router.HandleFunc("/api/v1/balance", handler.AppendBalance().ServeHTTP).Methods("PUT")
 
-	s.router.HandleFunc("/holder", handler.FreezeAmount().ServeHTTP).Methods("POST")
-	s.router.HandleFunc("/holder", handler.UnFreezeAmount().ServeHTTP).Methods("DELETE")
+	s.router.HandleFunc("/api/v1/holder", handler.FreezeAmount().ServeHTTP).Methods("POST")
+	s.router.HandleFunc("/api/v1/holder", handler.UnFreezeAmount().ServeHTTP).Methods("DELETE")
 }
