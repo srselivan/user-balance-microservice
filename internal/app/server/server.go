@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"github.com/gorilla/mux"
 	"net/http"
 	"time"
@@ -26,9 +27,13 @@ func (s *Server) Run(port string, handler *handler.Handler) error {
 		WriteTimeout:   10 * time.Second,
 	}
 
-	logrus.Infof("Starting server on %d port", port)
+	logrus.Infof("Starting server on %v port", port)
 
 	return s.httpServer.ListenAndServe()
+}
+
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.httpServer.Shutdown(ctx)
 }
 
 func (s *Server) configureRouter(handler *handler.Handler) {
