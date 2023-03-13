@@ -16,7 +16,6 @@ bin
 # vendor/
 
 #Environment variables
-.env
 
 #IDE
 .idea
